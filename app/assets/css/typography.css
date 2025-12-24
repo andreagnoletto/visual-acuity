@@ -1,0 +1,21 @@
+@font-face {
+  font-family: 'OpticianSans';
+  src: url('~/assets/fonts/OpticianSans.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.optotype {
+  font-family: 'OpticianSans', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
