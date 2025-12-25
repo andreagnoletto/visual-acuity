@@ -46,15 +46,15 @@ Aplicativo de triagem básica e treino de acuidade visual otimizado para TV, des
 
 2. Instale as dependências:
 
-   ```bash
-   npm install
+```bash
+npm install
    # ou
-   pnpm install
+pnpm install
    # ou
-   yarn install
+yarn install
    # ou
-   bun install
-   ```
+bun install
+```
 
 3. Baixe a fonte OpticianSans:
 

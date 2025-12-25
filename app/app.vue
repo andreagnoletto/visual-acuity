@@ -23,7 +23,7 @@ onMounted(() => {
     
     // Aplicar alto contraste
     if (highContrast.value) {
-      document.documentElement.classList.add('high-contrast');
+    document.documentElement.classList.add('high-contrast');
     }
   }
 });

@@ -45,7 +45,7 @@
             <div
               v-for="(optotype, optIndex) in line.directions"
               :key="optIndex"
-              class="direction"
+          class="direction"
             >
               <svg class="optotype-e" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" :style="{ transform: `rotate(${optotype.rotation}deg)` }">
                 <!-- E simétrico: 3 pernas horizontais iguais, espaçadas igualmente -->

@@ -46,8 +46,8 @@
               v-for="(symbol, symbolIndex) in line.symbols"
               :key="symbolIndex"
               class="symbol"
-            >
-              {{ symbol }}
+        >
+          {{ symbol }}
             </div>
           </div>
         </div>

@@ -221,13 +221,13 @@ onBeforeUnmount(() => {
 <style scoped>
 .distance-selector {
   width: 100%;
-  max-width: 600px;
-  padding: 2rem;
+  max-width: 400px;
+  padding: 1rem;
 }
 
 .selector-title {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
   text-align: center;
   color: var(--text-primary);
 }
@@ -235,17 +235,17 @@ onBeforeUnmount(() => {
 .distance-options {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .distance-option {
-  padding: 1.5rem;
+  padding: 1rem;
   background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -268,8 +268,8 @@ onBeforeUnmount(() => {
 }
 
 .custom-distance {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
   background-color: var(--button-bg);
   border-radius: 0.5rem;
   border: 1px solid var(--border-color);
@@ -278,19 +278,19 @@ onBeforeUnmount(() => {
 .custom-label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   opacity: 0.8;
 }
 
 .custom-input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.5rem;
   background-color: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: 0.5rem;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.875rem;
   outline: none;
 }
 
@@ -302,13 +302,13 @@ onBeforeUnmount(() => {
 }
 
 .warning-box {
-  padding: 1rem;
+  padding: 0.75rem;
   background-color: rgba(255, 193, 7, 0.15);
   border: 2px solid #ffc107;
   border-radius: 0.5rem;
   color: #ffc107;
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
@@ -318,12 +318,12 @@ onBeforeUnmount(() => {
 }
 
 .confirm-button {
-  padding: 1rem 3rem;
+  padding: 0.75rem 2rem;
   background-color: var(--button-active-bg);
-  border: 3px solid var(--accent);
-  border-radius: 0.75rem;
+  border: 2px solid var(--accent);
+  border-radius: 0.5rem;
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

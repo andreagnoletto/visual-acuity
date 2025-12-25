@@ -2,7 +2,7 @@
   <div class="screen-calibration">
     <h2 class="calibration-title">Calibração da Tela</h2>
     <p class="calibration-instruction">
-      Coloque um cartão de referência de 85,6mm na tela e ajuste o retângulo com as setas ←→ para corresponder ao tamanho do cartão.
+      Coloque uma régua de 10cm x 10cm (ou um cartão de referência de 85,6mm) na tela e ajuste o retângulo com as setas ←→ para corresponder ao tamanho da régua ou cartão.
     </p>
     
     <div class="calibration-area">
@@ -11,7 +11,7 @@
         class="reference-card"
         :style="{ width: cardWidthPx + 'px', height: cardHeightPx + 'px' }"
       >
-        <div class="card-label">85,6mm</div>
+        <div class="card-label">10cm × 10cm<br/>85,6mm</div>
       </div>
     </div>
 
@@ -78,7 +78,7 @@ const decreaseRef = ref<HTMLButtonElement>();
 const increaseRef = ref<HTMLButtonElement>();
 const confirmRef = ref<HTMLButtonElement>();
 
-const { normalizeRemoteKey, saveFocus, restoreFocus } = useRemoteNavigation({
+const { normalizeRemoteKey, saveFocus, restoreFocus, savedFocusIndex } = useRemoteNavigation({
   restoreFocus: true
 });
 
@@ -179,16 +179,16 @@ const handleConfirmKeyDown = (event: KeyboardEvent) => {
 };
 
 onMounted(() => {
+  restoreFocus();
   updateTabindex();
   const items = [decreaseRef.value, increaseRef.value, confirmRef.value].filter(Boolean) as HTMLElement[];
-  if (!restoreFocus(items)) {
+  if (savedFocusIndex.value !== null && savedFocusIndex.value >= 0 && savedFocusIndex.value < items.length) {
+    currentIndex.value = savedFocusIndex.value;
+    updateTabindex();
+    items[savedFocusIndex.value]?.focus();
+  } else {
     if (decreaseRef.value) {
       decreaseRef.value.focus();
-    }
-  } else {
-    const savedIndex = items.findIndex(item => item.tabIndex === 0);
-    if (savedIndex >= 0) {
-      currentIndex.value = savedIndex;
     }
   }
 });
@@ -205,35 +205,35 @@ onBeforeUnmount(() => {
 <style scoped>
 .screen-calibration {
   width: 100%;
-  max-width: 800px;
-  padding: 2rem;
+  max-width: 500px;
+  padding: 1rem;
 }
 
 .calibration-title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
   text-align: center;
   color: var(--text-primary);
 }
 
 .calibration-instruction {
-  font-size: 1rem;
-  margin-bottom: 2rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
   text-align: center;
   color: var(--text-primary);
   opacity: 0.9;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .calibration-area {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 300px;
-  margin-bottom: 2rem;
+  min-height: 200px;
+  margin-bottom: 1rem;
   background-color: var(--button-bg);
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: 0.75rem;
+  padding: 1rem;
   border: 1px solid var(--border-color);
 }
 
@@ -249,22 +249,22 @@ onBeforeUnmount(() => {
 
 .card-label {
   color: var(--text-primary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .controls {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .control-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .control-label {
   display: block;
-  margin-bottom: 0.75rem;
-  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
   text-align: center;
   color: var(--text-primary);
 }
@@ -273,16 +273,16 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .control-button {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -299,42 +299,42 @@ onBeforeUnmount(() => {
 }
 
 .control-value {
-  min-width: 100px;
+  min-width: 80px;
   text-align: center;
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--accent);
 }
 
 .warning-box {
-  padding: 1rem;
+  padding: 0.75rem;
   background-color: rgba(255, 193, 7, 0.15);
   border: 2px solid #ffc107;
   border-radius: 0.5rem;
   color: #ffc107;
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .info-box {
-  padding: 1rem;
+  padding: 0.75rem;
   background-color: var(--button-active-bg);
   border: 2px solid var(--accent);
   border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
 .info-box p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
 }
 
 .info-box strong {
   color: var(--accent);
-  font-size: 1.25rem;
+  font-size: 1rem;
 }
 
 .actions {
@@ -343,12 +343,12 @@ onBeforeUnmount(() => {
 }
 
 .confirm-button {
-  padding: 1rem 3rem;
+  padding: 0.75rem 2rem;
   background-color: var(--button-active-bg);
-  border: 3px solid var(--accent);
-  border-radius: 0.75rem;
+  border: 2px solid var(--accent);
+  border-radius: 0.5rem;
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
