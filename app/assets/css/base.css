@@ -66,6 +66,12 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+.v-application {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
 :focus-visible {
   outline: 4px solid var(--accent);
   outline-offset: 2px;
@@ -114,4 +120,3 @@ a {
   background-color: var(--accent);
   color: var(--bg-primary);
 }
-

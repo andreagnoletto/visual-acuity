@@ -1,10 +1,7 @@
 <template>
-  <div class="setup-page">
-    <DistanceSelector
-      v-model="distance"
-      @confirm="handleConfirm"
-    />
-  </div>
+  <v-container class="setup-page" fluid>
+    <DistanceSelector v-model="distance" @confirm="handleConfirm" />
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -28,11 +25,8 @@ useRemoteNavigation({
 
 <style scoped>
 .setup-page {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
 }
 </style>
-

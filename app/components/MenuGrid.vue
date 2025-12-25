@@ -1,16 +1,27 @@
 <template>
-  <div class="menu-grid" ref="gridRef">
-    <button
-      v-for="(item, index) in items"
-      :key="index"
-      :ref="(el) => setItemRef(el, index)"
-      class="menu-item"
-      @click="handleItemClick(item)"
-      @keydown="handleKeyDown($event, index)"
-    >
-      {{ item.label }}
-    </button>
-  </div>
+  <v-container class="menu-grid" fluid ref="gridRef">
+    <v-row :dense="true" class="menu-row" align="stretch" justify="center">
+      <v-col
+        v-for="(item, index) in items"
+        :key="index"
+        :cols="12"
+        :sm="columnSpan"
+        :md="columnSpan"
+      >
+        <v-btn
+          :ref="(el) => setItemRef(el, index)"
+          class="menu-item"
+          color="primary"
+          variant="tonal"
+          block
+          @click="handleItemClick(item)"
+          @keydown="handleKeyDown($event, index)"
+        >
+          {{ item.label }}
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -32,9 +43,16 @@ const gridRef = ref<HTMLElement>();
 const itemRefs = ref<HTMLElement[]>([]);
 const currentIndex = ref(0);
 
-const setItemRef = (el: HTMLElement | null, index: number) => {
-  if (el) {
-    itemRefs.value[index] = el;
+const columnSpan = computed(() => Math.floor(12 / props.columns));
+
+const resolveElement = (el: any): HTMLElement | null => {
+  return (el?.$el ?? el) as HTMLElement | null;
+};
+
+const setItemRef = (el: any, index: number) => {
+  const element = resolveElement(el);
+  if (element) {
+    itemRefs.value[index] = element;
   }
 };
 
@@ -87,7 +105,7 @@ const moveFocus = (direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
 
 const handleKeyDown = (event: KeyboardEvent, index: number) => {
   const action = normalizeRemoteKey(event);
-  
+
   if (action === 'UP' || action === 'DOWN' || action === 'LEFT' || action === 'RIGHT') {
     event.preventDefault();
     currentIndex.value = index;
@@ -126,42 +144,16 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .menu-grid {
-  display: grid;
-  grid-template-columns: repeat(v-bind('props.columns'), 1fr);
+  max-width: 900px;
+}
+
+.menu-row {
   gap: 1.5rem;
-  width: 100%;
-  max-width: 800px;
-  padding: 2rem;
 }
 
 .menu-item {
-  padding: 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
   min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-item:hover {
-  background-color: var(--button-bg-hover);
-}
-
-.menu-item:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 </style>
-

@@ -1,15 +1,17 @@
 <template>
-  <div class="tv-layout">
-    <header v-if="showHeader" class="tv-header">
-      TV Visual Check
-    </header>
-    <main class="tv-main">
-      <slot />
-    </main>
-    <footer class="tv-footer">
+  <v-app class="tv-layout">
+    <v-app-bar v-if="showHeader" flat density="comfortable" class="tv-header">
+      <v-toolbar-title>TV Visual Check</v-toolbar-title>
+    </v-app-bar>
+    <v-main class="tv-main">
+      <v-container class="tv-container" fluid>
+        <slot />
+      </v-container>
+    </v-main>
+    <v-footer app class="tv-footer">
       <RemoteHint />
-    </footer>
-  </div>
+    </v-footer>
+  </v-app>
 </template>
 
 <script setup lang="ts">
@@ -25,51 +27,38 @@ withDefaults(defineProps<Props>(), {
 <style scoped>
 .tv-layout {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  padding: max(2rem, env(safe-area-inset-top)) max(2rem, env(safe-area-inset-right)) max(2rem, env(safe-area-inset-bottom)) max(2rem, env(safe-area-inset-left));
-  box-sizing: border-box;
-  position: relative;
-  padding-bottom: 120px;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .tv-header {
-  padding: 0.5rem 0;
-  text-align: center;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1rem;
-}
-
-.tv-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin: 0;
-  color: var(--text-primary);
+  background-color: var(--bg-primary);
 }
 
 .tv-main {
-  flex: 1;
+  padding-bottom: 96px;
+}
+
+.tv-container {
+  min-height: calc(100vh - 96px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  padding-bottom: 120px;
+  padding: max(2rem, env(safe-area-inset-top))
+    max(2rem, env(safe-area-inset-right))
+    max(2rem, env(safe-area-inset-bottom))
+    max(2rem, env(safe-area-inset-left));
+  box-sizing: border-box;
 }
 
 .tv-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem max(2rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(2rem, env(safe-area-inset-left));
   background-color: var(--bg-primary);
-  z-index: 1000;
   border-top: 1px solid var(--border-color);
-  transition: background-color 0.3s, border-color 0.3s;
+  padding: 1rem max(2rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom))
+    max(2rem, env(safe-area-inset-left));
 }
 </style>
-

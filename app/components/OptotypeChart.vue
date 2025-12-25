@@ -1,17 +1,20 @@
 <template>
-  <div class="optotype-chart">
-    <div
+  <v-container class="optotype-chart" fluid>
+    <v-row
       v-for="(line, index) in optotypeLines"
       :key="index"
       class="optotype-line"
       :class="{ 'current-line': line.lineIndex === props.currentLineIndex }"
       :style="{ fontSize: line.fontSizePx + 'px' }"
+      align="center"
+      justify="center"
+      no-gutters
     >
-      <div class="line-label">
+      <v-col cols="auto" class="line-label">
         <span class="snellen-ratio">{{ line.snellenRatio }}</span>
         <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
-      </div>
-      <div class="optotypes-container">
+      </v-col>
+      <v-col class="optotypes-container">
         <span
           v-for="(optotype, optIndex) in line.displayOptotypes"
           :key="optIndex"
@@ -19,9 +22,9 @@
         >
           {{ optotype }}
         </span>
-      </div>
-    </div>
-  </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -67,14 +70,14 @@ const calculateOptotypesCount = (fontSizePx: number, snellenRatio: string): numb
 const optotypeLines = computed<OptotypeLineDisplay[]>(() => {
   // Usar windowWidth para forçar recálculo quando a tela redimensionar
   const _ = windowWidth.value;
-  
+
   const lines = generateLines();
-  
+
   if (props.showAllLines) {
     return lines.map((line, idx) => {
       const visionLine = VISION_LINES[idx];
       if (!visionLine) return line;
-      
+
       const count = calculateOptotypesCount(line.fontSizePx, line.snellenRatio);
       return {
         ...line,
@@ -116,15 +119,11 @@ const optotypeLines = computed<OptotypeLineDisplay[]>(() => {
 }
 
 .optotype-line {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 2rem;
   width: 100%;
-  justify-content: center;
   opacity: 0.3;
   transition: opacity 0.3s, color 0.3s;
   color: var(--text-secondary);
+  gap: 2rem;
 }
 
 .optotype-line.current-line {
@@ -177,4 +176,3 @@ const optotypeLines = computed<OptotypeLineDisplay[]>(() => {
   color: inherit;
 }
 </style>
-

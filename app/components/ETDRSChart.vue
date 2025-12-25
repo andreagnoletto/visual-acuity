@@ -1,18 +1,21 @@
 <template>
-  <div class="etdrs-chart">
-    <div
-      v-for="(line, index) in visibleLines"
+  <v-container class="etdrs-chart" fluid>
+    <v-row
+      v-for="line in visibleLines"
       :key="line.lineIndex"
       class="etdrs-line"
       :class="{ 'current-line': line.lineIndex === currentLineIndex }"
       :style="{ fontSize: line.fontSizePx + 'px' }"
+      align="center"
+      justify="center"
+      no-gutters
     >
-      <div class="line-label">
+      <v-col cols="auto" class="line-label">
         <span class="line-number">Linha {{ line.lineNumber }}</span>
         <span class="snellen-ratio">{{ line.snellenRatio }}</span>
         <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
-      </div>
-      <div class="optotypes-container">
+      </v-col>
+      <v-col class="optotypes-container">
         <span
           v-for="(optotype, optIndex) in line.displayOptotypes"
           :key="optIndex"
@@ -20,9 +23,9 @@
         >
           {{ optotype }}
         </span>
-      </div>
-    </div>
-  </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -68,18 +71,18 @@ if (typeof window !== 'undefined') {
 const visibleLines = computed<ETDRSLineDisplay[]>(() => {
   const _ = windowWidth.value;
   const _h = windowHeight.value;
-  
+
   const lines = generateETDRSLines();
   if (lines.length === 0) return [];
-  
+
   const currentLine = lines[props.currentLineIndex];
   if (!currentLine) return [];
-  
+
   const visibleCount = calculateVisibleLinesCount(currentLine.fontSizePx, windowHeight.value);
   const halfCount = Math.floor(visibleCount / 2);
   const startIndex = Math.max(0, props.currentLineIndex - halfCount);
   const endIndex = Math.min(lines.length - 1, props.currentLineIndex + (visibleCount - halfCount - 1));
-  
+
   const visibleLinesResult: ETDRSLineDisplay[] = [];
   for (let i = startIndex; i <= endIndex; i++) {
     const line = lines[i];
@@ -97,7 +100,7 @@ const visibleLines = computed<ETDRSLineDisplay[]>(() => {
       });
     }
   }
-  
+
   return visibleLinesResult;
 });
 </script>
@@ -115,15 +118,11 @@ const visibleLines = computed<ETDRSLineDisplay[]>(() => {
 }
 
 .etdrs-line {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 2rem;
   width: 100%;
-  justify-content: center;
   opacity: 0.3;
   transition: opacity 0.3s, color 0.3s;
   color: var(--text-secondary);
+  gap: 2rem;
 }
 
 .etdrs-line.current-line {
@@ -181,4 +180,3 @@ const visibleLines = computed<ETDRSLineDisplay[]>(() => {
   color: inherit;
 }
 </style>
-

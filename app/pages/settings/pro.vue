@@ -1,97 +1,128 @@
 <template>
-  <div class="pro-page">
-    <h2 class="pro-title">Modo Pro</h2>
+  <v-container class="pro-page" fluid>
+    <v-row justify="center">
+      <v-col cols="12" md="10" lg="8">
+        <v-card elevation="8">
+          <v-card-title class="text-h4 text-center">Modo Pro</v-card-title>
+          <v-card-text>
+            <div v-if="!isUnlocked" class="pin-entry">
+              <div class="pin-title">Digite o PIN</div>
+              <div class="pin-display">
+                <v-chip
+                  v-for="(digit, index) in pinDisplay"
+                  :key="index"
+                  class="pin-digit"
+                  :color="digit !== '' ? 'primary' : 'secondary'"
+                  variant="tonal"
+                >
+                  {{ digit || '○' }}
+                </v-chip>
+              </div>
+              <v-row class="pin-keypad" dense>
+                <v-col cols="4" v-for="num in 9" :key="num">
+                  <v-btn
+                    :ref="(el) => setKeypadRef(el, num - 1)"
+                    color="secondary"
+                    variant="tonal"
+                    block
+                    size="x-large"
+                    @click="enterDigit(num)"
+                    @keydown="handleKeypadKeyDown($event, num - 1)"
+                  >
+                    {{ num }}
+                  </v-btn>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn
+                    ref="zeroKeyRef"
+                    color="secondary"
+                    variant="tonal"
+                    block
+                    size="x-large"
+                    @click="enterDigit(0)"
+                    @keydown="handleZeroKeyDown"
+                  >
+                    0
+                  </v-btn>
+                </v-col>
+                <v-col cols="4">
+                  <v-btn
+                    ref="clearKeyRef"
+                    color="warning"
+                    variant="tonal"
+                    block
+                    size="x-large"
+                    @click="clearPin"
+                    @keydown="handleClearKeyDown"
+                  >
+                    C
+                  </v-btn>
+                </v-col>
+              </v-row>
+              <v-alert v-if="pinError" type="error" variant="tonal" class="pin-error">
+                PIN incorreto
+              </v-alert>
+            </div>
 
-    <div v-if="!isUnlocked" class="pin-entry">
-      <h3 class="pin-title">Digite o PIN</h3>
-      <div class="pin-display">
-        <span
-          v-for="(digit, index) in pinDisplay"
-          :key="index"
-          class="pin-digit"
-          :class="{ filled: digit !== '' }"
-        >
-          {{ digit || '○' }}
-        </span>
-      </div>
-      <div class="pin-keypad">
-        <button
-          v-for="num in 9"
-          :key="num"
-          :ref="(el) => setKeypadRef(el, num - 1)"
-          class="pin-key"
-          @click="enterDigit(num)"
-          @keydown="handleKeypadKeyDown($event, num - 1)"
-        >
-          {{ num }}
-        </button>
-        <button
-          ref="zeroKeyRef"
-          class="pin-key"
-          @click="enterDigit(0)"
-          @keydown="handleZeroKeyDown"
-        >
-          0
-        </button>
-        <button
-          ref="clearKeyRef"
-          class="pin-key clear"
-          @click="clearPin"
-          @keydown="handleClearKeyDown"
-        >
-          C
-        </button>
-      </div>
-      <div v-if="pinError" class="pin-error">
-        PIN incorreto
-      </div>
-    </div>
+            <div v-else class="pro-content">
+              <v-card class="pro-section" variant="tonal">
+                <v-card-title class="section-title">Travar Calibração</v-card-title>
+                <v-card-text>
+                  <v-btn
+                    ref="lockToggleRef"
+                    :color="calibrationLocked ? 'warning' : 'secondary'"
+                    :variant="calibrationLocked ? 'elevated' : 'tonal'"
+                    @click="toggleCalibrationLock"
+                    @keydown="handleLockKeyDown"
+                  >
+                    {{ calibrationLocked ? 'TRAVADA' : 'DESTRAVADA' }}
+                  </v-btn>
+                  <p class="section-hint">Quando travada, a calibração não pode ser alterada</p>
+                </v-card-text>
+              </v-card>
 
-    <div v-else class="pro-content">
-      <div class="pro-section">
-        <h3 class="section-title">Travar Calibração</h3>
-        <button
-          ref="lockToggleRef"
-          class="toggle-button"
-          :class="{ active: calibrationLocked }"
-          @click="toggleCalibrationLock"
-          @keydown="handleLockKeyDown"
-        >
-          {{ calibrationLocked ? 'TRAVADA' : 'DESTRAVADA' }}
-        </button>
-        <p class="section-hint">Quando travada, a calibração não pode ser alterada</p>
-      </div>
+              <v-card class="pro-section" variant="tonal">
+                <v-card-title class="section-title">Contador de Sessões</v-card-title>
+                <v-card-text>
+                  <div class="session-counter">{{ sessionCount }}</div>
+                  <p class="section-hint">Número de sessões de teste realizadas</p>
+                </v-card-text>
+              </v-card>
 
-      <div class="pro-section">
-        <h3 class="section-title">Contador de Sessões</h3>
-        <div class="session-counter">{{ sessionCount }}</div>
-        <p class="section-hint">Número de sessões de teste realizadas</p>
-      </div>
+              <v-card class="pro-section" variant="tonal">
+                <v-card-title class="section-title">Alterar PIN</v-card-title>
+                <v-card-text>
+                  <v-btn
+                    ref="changePinRef"
+                    color="secondary"
+                    variant="tonal"
+                    @click="changePin"
+                    @keydown="handleChangePinKeyDown"
+                  >
+                    Alterar PIN
+                  </v-btn>
+                </v-card-text>
+              </v-card>
 
-      <div class="pro-section">
-        <h3 class="section-title">Alterar PIN</h3>
-        <button
-          ref="changePinRef"
-          class="action-button"
-          @click="changePin"
-          @keydown="handleChangePinKeyDown"
-        >
-          Alterar PIN
-        </button>
-      </div>
-
-      <div class="pro-section">
-        <button
-          ref="backRef"
-          class="action-button"
-          @click="goBack"
-          @keydown="handleBackKeyDown"
-        >
-          Voltar
-        </button>
-      </div>
-    </div>
-  </div>
+              <v-card class="pro-section" variant="tonal">
+                <v-card-text>
+                  <v-btn
+                    ref="backRef"
+                    color="secondary"
+                    variant="tonal"
+                    @click="goBack"
+                    @keydown="handleBackKeyDown"
+                  >
+                    Voltar
+                  </v-btn>
+                </v-card-text>
+              </v-card>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -103,12 +134,12 @@ const pinInput = ref('');
 const pinError = ref(false);
 const calibrationLocked = ref(false);
 
-const keypadRefs = ref<(HTMLButtonElement | null)[]>([]);
-const zeroKeyRef = ref<HTMLButtonElement>();
-const clearKeyRef = ref<HTMLButtonElement>();
-const lockToggleRef = ref<HTMLButtonElement>();
-const changePinRef = ref<HTMLButtonElement>();
-const backRef = ref<HTMLButtonElement>();
+const keypadRefs = ref<(HTMLElement | null)[]>([]);
+const zeroKeyRef = ref<any>();
+const clearKeyRef = ref<any>();
+const lockToggleRef = ref<any>();
+const changePinRef = ref<any>();
+const backRef = ref<any>();
 
 const { normalizeRemoteKey } = useRemoteNavigation({
   restoreFocus: true
@@ -118,14 +149,19 @@ const pinDisplay = computed(() => {
   return pinInput.value.padEnd(4, '').split('').slice(0, 4);
 });
 
-const setKeypadRef = (el: HTMLButtonElement | null, index: number) => {
-  if (el) {
-    keypadRefs.value[index] = el;
+const resolveElement = (el: any): HTMLElement | null => {
+  return (el?.$el ?? el) as HTMLElement | null;
+};
+
+const setKeypadRef = (el: any, index: number) => {
+  const element = resolveElement(el);
+  if (element) {
+    keypadRefs.value[index] = element;
   }
 };
 
 const updateKeypadTabindex = () => {
-  const allKeys = [...keypadRefs.value, zeroKeyRef.value, clearKeyRef.value].filter(Boolean) as HTMLElement[];
+  const allKeys = [...keypadRefs.value, resolveElement(zeroKeyRef.value), resolveElement(clearKeyRef.value)].filter(Boolean) as HTMLElement[];
   allKeys.forEach((key, index) => {
     if (key) {
       key.tabIndex = index === currentKeypadIndex.value ? 0 : -1;
@@ -139,7 +175,7 @@ const enterDigit = (digit: number) => {
   if (pinInput.value.length < 4) {
     pinInput.value += digit.toString();
     pinError.value = false;
-    
+
     if (pinInput.value.length === 4) {
       if (verifyProPin(pinInput.value)) {
         isUnlocked.value = true;
@@ -181,8 +217,8 @@ const goBack = () => {
 
 const handleKeypadKeyDown = (event: KeyboardEvent, index: number) => {
   const action = normalizeRemoteKey(event);
-  const allKeys = [...keypadRefs.value, zeroKeyRef.value, clearKeyRef.value].filter(Boolean) as HTMLElement[];
-  
+  const allKeys = [...keypadRefs.value, resolveElement(zeroKeyRef.value), resolveElement(clearKeyRef.value)].filter(Boolean) as HTMLElement[];
+
   if (action === 'OK') {
     event.preventDefault();
     enterDigit(index + 1);
@@ -192,7 +228,7 @@ const handleKeypadKeyDown = (event: KeyboardEvent, index: number) => {
     const cols = 3;
     const row = Math.floor(index / cols);
     const col = index % cols;
-    
+
     switch (action) {
       case 'UP':
         newIndex = row > 0 ? index - cols : index;
@@ -207,7 +243,7 @@ const handleKeypadKeyDown = (event: KeyboardEvent, index: number) => {
         newIndex = col < 2 ? index + 1 : index;
         break;
     }
-    
+
     if (newIndex < allKeys.length) {
       currentKeypadIndex.value = newIndex;
       updateKeypadTabindex();
@@ -249,8 +285,8 @@ const handleLockKeyDown = (event: KeyboardEvent) => {
     toggleCalibrationLock();
   } else if (action === 'UP' || action === 'DOWN') {
     event.preventDefault();
-    const controls = [lockToggleRef.value, changePinRef.value, backRef.value].filter(Boolean) as HTMLElement[];
-    const currentIndex = controls.findIndex(c => c === lockToggleRef.value);
+    const controls = [resolveElement(lockToggleRef.value), resolveElement(changePinRef.value), resolveElement(backRef.value)].filter(Boolean) as HTMLElement[];
+    const currentIndex = controls.findIndex(c => c === resolveElement(lockToggleRef.value));
     let newIndex = currentIndex;
     if (action === 'DOWN') {
       newIndex = Math.min(controls.length - 1, currentIndex + 1);
@@ -268,8 +304,8 @@ const handleChangePinKeyDown = (event: KeyboardEvent) => {
     changePin();
   } else if (action === 'UP' || action === 'DOWN') {
     event.preventDefault();
-    const controls = [lockToggleRef.value, changePinRef.value, backRef.value].filter(Boolean) as HTMLElement[];
-    const currentIndex = controls.findIndex(c => c === changePinRef.value);
+    const controls = [resolveElement(lockToggleRef.value), resolveElement(changePinRef.value), resolveElement(backRef.value)].filter(Boolean) as HTMLElement[];
+    const currentIndex = controls.findIndex(c => c === resolveElement(changePinRef.value));
     let newIndex = currentIndex;
     if (action === 'DOWN') {
       newIndex = Math.min(controls.length - 1, currentIndex + 1);
@@ -287,7 +323,7 @@ const handleBackKeyDown = (event: KeyboardEvent) => {
     goBack();
   } else if (action === 'UP') {
     event.preventDefault();
-    changePinRef.value?.focus();
+    resolveElement(changePinRef.value)?.focus();
   }
 };
 
@@ -311,39 +347,26 @@ onMounted(() => {
       keypadRefs.value[0].focus();
     }
   } else {
-    if (lockToggleRef.value) {
-      lockToggleRef.value.focus();
-    }
+    resolveElement(lockToggleRef.value)?.focus();
   }
 });
 </script>
 
 <style scoped>
 .pro-page {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
   padding: 2rem;
-}
-
-.pro-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: var(--text-primary);
 }
 
 .pin-entry {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .pin-title {
-  font-size: 1.5rem;
-  margin: 0;
-  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .pin-display {
@@ -358,119 +381,37 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--button-bg);
-  border: 3px solid var(--border-color);
-  border-radius: 0.5rem;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.pin-digit.filled {
-  color: var(--accent);
-  border-color: var(--accent);
 }
 
 .pin-keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  max-width: 300px;
-}
-
-.pin-key {
-  padding: 1.5rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  min-height: 80px;
-}
-
-.pin-key.clear {
-  background-color: rgba(255, 193, 7, 0.2);
-  border-color: #ffc107;
-}
-
-.pin-key:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
+  max-width: 360px;
+  margin: 0 auto;
 }
 
 .pin-error {
-  padding: 1rem;
-  background-color: rgba(255, 0, 0, 0.2);
-  border: 2px solid #ff0000;
-  border-radius: 0.5rem;
-  color: #ff0000;
-  font-weight: 600;
+  margin-top: 1rem;
 }
 
 .pro-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .pro-section {
-  padding: 1.5rem;
-  background-color: var(--button-bg);
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem;
 }
 
 .section-title {
-  font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
 }
 
 .section-hint {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  margin: 0;
-  opacity: 0.7;
-}
-
-.toggle-button {
-  padding: 1rem 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  align-self: flex-start;
-}
-
-.toggle-button.active {
-  background-color: rgba(255, 193, 7, 0.2);
-  border-color: #ffc107;
-}
-
-.toggle-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
+  margin-top: 0.5rem;
 }
 
 .session-counter {
@@ -479,28 +420,4 @@ onMounted(() => {
   color: var(--accent);
   text-align: center;
 }
-
-.action-button {
-  padding: 1.25rem 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  align-self: flex-start;
-}
-
-.action-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
-}
 </style>
-
