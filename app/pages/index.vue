@@ -1,7 +1,7 @@
 <template>
-  <div class="home-page">
+  <v-container class="home-page" fluid>
     <MenuGrid :items="menuItems" :columns="2" />
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -61,11 +61,8 @@ useRemoteNavigation({
 
 <style scoped>
 .home-page {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
 }
 </style>
-

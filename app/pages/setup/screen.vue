@@ -1,7 +1,7 @@
 <template>
-  <div class="setup-page">
+  <v-container class="setup-page" fluid>
     <ScreenCalibration @confirm="handleConfirm" />
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -24,11 +24,8 @@ useRemoteNavigation({
 
 <style scoped>
 .setup-page {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
 }
 </style>
-

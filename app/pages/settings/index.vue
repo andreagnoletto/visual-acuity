@@ -1,109 +1,135 @@
 <template>
-  <div class="settings-page">
-    <h2 class="settings-title">Configurações</h2>
+  <v-container class="settings-page" fluid>
+    <v-row justify="center">
+      <v-col cols="12" md="10" lg="8">
+        <v-card elevation="8">
+          <v-card-title class="text-h4 text-center">Configurações</v-card-title>
+          <v-card-text class="settings-content">
+            <v-card class="setting-group" variant="tonal">
+              <v-card-title class="setting-label">Fator de Correção</v-card-title>
+              <v-card-text>
+                <div class="slider-container">
+                  <v-btn
+                    ref="decreaseFactorRef"
+                    color="secondary"
+                    variant="tonal"
+                    @click="decreaseFactor"
+                    @keydown="handleSliderKeyDown($event, 'decrease')"
+                  >
+                    <v-icon start>mdi-chevron-left</v-icon>
+                    Diminuir
+                  </v-btn>
+                  <div class="slider-value">{{ correctionFactor.toFixed(2) }}</div>
+                  <v-btn
+                    ref="increaseFactorRef"
+                    color="secondary"
+                    variant="tonal"
+                    @click="increaseFactor"
+                    @keydown="handleSliderKeyDown($event, 'increase')"
+                  >
+                    Aumentar
+                    <v-icon end>mdi-chevron-right</v-icon>
+                  </v-btn>
+                </div>
+                <p class="setting-hint">Ajuste fino do tamanho dos optótipos (0.90 - 1.10)</p>
+              </v-card-text>
+            </v-card>
 
-    <div class="settings-content">
-      <div class="setting-group">
-        <label class="setting-label">Fator de Correção</label>
-        <div class="slider-container">
-          <button
-            ref="decreaseFactorRef"
-            class="slider-button"
-            @click="decreaseFactor"
-            @keydown="handleSliderKeyDown($event, 'decrease')"
-          >
-            ←
-          </button>
-          <div class="slider-value">{{ correctionFactor.toFixed(2) }}</div>
-          <button
-            ref="increaseFactorRef"
-            class="slider-button"
-            @click="increaseFactor"
-            @keydown="handleSliderKeyDown($event, 'increase')"
-          >
-            →
-          </button>
-        </div>
-        <p class="setting-hint">Ajuste fino do tamanho dos optótipos (0.90 - 1.10)</p>
-      </div>
+            <v-card class="setting-group" variant="tonal">
+              <v-card-title class="setting-label">Modo Diurno</v-card-title>
+              <v-card-text>
+                <v-btn
+                  ref="dayModeToggleRef"
+                  :color="dayMode ? 'primary' : 'secondary'"
+                  :variant="dayMode ? 'elevated' : 'tonal'"
+                  @click="toggleDayMode"
+                  @keydown="handleDayModeKeyDown"
+                >
+                  {{ dayMode ? 'DIURNO' : 'NOTURNO' }}
+                </v-btn>
+                <p class="setting-hint">Alterna entre tema claro (diurno) e escuro (noturno)</p>
+              </v-card-text>
+            </v-card>
 
-      <div class="setting-group">
-        <label class="setting-label">Modo Diurno</label>
-        <button
-          ref="dayModeToggleRef"
-          class="toggle-button"
-          :class="{ active: dayMode }"
-          @click="toggleDayMode"
-          @keydown="handleDayModeKeyDown"
-        >
-          {{ dayMode ? 'DIURNO' : 'NOTURNO' }}
-        </button>
-        <p class="setting-hint">Alterna entre tema claro (diurno) e escuro (noturno)</p>
-      </div>
+            <v-card class="setting-group" variant="tonal">
+              <v-card-title class="setting-label">Alto Contraste</v-card-title>
+              <v-card-text>
+                <v-btn
+                  ref="contrastToggleRef"
+                  :color="highContrast ? 'primary' : 'secondary'"
+                  :variant="highContrast ? 'elevated' : 'tonal'"
+                  @click="toggleContrast"
+                  @keydown="handleToggleKeyDown"
+                >
+                  {{ highContrast ? 'ON' : 'OFF' }}
+                </v-btn>
+                <p class="setting-hint">Aumenta o contraste para melhor visibilidade</p>
+              </v-card-text>
+            </v-card>
 
-      <div class="setting-group">
-        <label class="setting-label">Alto Contraste</label>
-        <button
-          ref="contrastToggleRef"
-          class="toggle-button"
-          :class="{ active: highContrast }"
-          @click="toggleContrast"
-          @keydown="handleToggleKeyDown"
-        >
-          {{ highContrast ? 'ON' : 'OFF' }}
-        </button>
-        <p class="setting-hint">Aumenta o contraste para melhor visibilidade</p>
-      </div>
+            <v-card class="setting-group" variant="tonal">
+              <v-card-title class="setting-label">Calibração</v-card-title>
+              <v-card-text>
+                <v-btn
+                  ref="recalibrateRef"
+                  color="warning"
+                  variant="tonal"
+                  @click="recalibrate"
+                  @keydown="handleActionKeyDown"
+                >
+                  Refazer Calibração
+                </v-btn>
+                <p class="setting-hint">Redefine distância e calibração da tela</p>
+              </v-card-text>
+            </v-card>
 
-      <div class="setting-group">
-        <button
-          ref="recalibrateRef"
-          class="action-button"
-          @click="recalibrate"
-          @keydown="handleActionKeyDown"
-        >
-          Refazer Calibração
-        </button>
-        <p class="setting-hint">Redefine distância e calibração da tela</p>
-      </div>
-
-      <div class="setting-group">
-        <button
-          ref="proModeRef"
-          class="action-button pro"
-          @click="goToPro"
-          @keydown="handleProKeyDown"
-        >
-          Modo Pro
-        </button>
-      </div>
-    </div>
-  </div>
+            <v-card class="setting-group" variant="tonal">
+              <v-card-text>
+                <v-btn
+                  ref="proModeRef"
+                  color="warning"
+                  variant="elevated"
+                  @click="goToPro"
+                  @keydown="handleProKeyDown"
+                >
+                  Modo Pro
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 const { correctionFactor, setCorrectionFactor, resetCalibration } = useCalibration();
 const { highContrast, dayMode, setHighContrast, setDayMode } = useSettings();
 
-const decreaseFactorRef = ref<HTMLButtonElement>();
-const increaseFactorRef = ref<HTMLButtonElement>();
-const dayModeToggleRef = ref<HTMLButtonElement>();
-const contrastToggleRef = ref<HTMLButtonElement>();
-const recalibrateRef = ref<HTMLButtonElement>();
-const proModeRef = ref<HTMLButtonElement>();
+const decreaseFactorRef = ref<any>();
+const increaseFactorRef = ref<any>();
+const dayModeToggleRef = ref<any>();
+const contrastToggleRef = ref<any>();
+const recalibrateRef = ref<any>();
+const proModeRef = ref<any>();
 
 const { normalizeRemoteKey } = useRemoteNavigation({
   restoreFocus: true
 });
 
+const resolveElement = (el: any): HTMLElement | null => {
+  return (el?.$el ?? el) as HTMLElement | null;
+};
+
 const currentIndex = ref(0);
 const controlRefs = computed(() => [
-  decreaseFactorRef.value,
-  increaseFactorRef.value,
-  dayModeToggleRef.value,
-  contrastToggleRef.value,
-  recalibrateRef.value,
-  proModeRef.value
+  resolveElement(decreaseFactorRef.value),
+  resolveElement(increaseFactorRef.value),
+  resolveElement(dayModeToggleRef.value),
+  resolveElement(contrastToggleRef.value),
+  resolveElement(recalibrateRef.value),
+  resolveElement(proModeRef.value)
 ].filter(Boolean) as HTMLElement[]);
 
 const updateTabindex = () => {
@@ -145,7 +171,7 @@ const goToPro = () => {
 
 const handleSliderKeyDown = (event: KeyboardEvent, direction: 'decrease' | 'increase') => {
   const action = normalizeRemoteKey(event);
-  
+
   if (action === 'LEFT' || action === 'RIGHT') {
     event.preventDefault();
     if (action === 'LEFT') {
@@ -244,7 +270,7 @@ const handleProKeyDown = (event: KeyboardEvent) => {
     event.preventDefault();
     currentIndex.value = 3;
     updateTabindex();
-    recalibrateRef.value?.focus();
+    resolveElement(recalibrateRef.value)?.focus();
   }
 };
 
@@ -259,9 +285,7 @@ useRemoteNavigation({
 
 onMounted(() => {
   updateTabindex();
-  if (decreaseFactorRef.value) {
-    decreaseFactorRef.value.focus();
-  }
+  resolveElement(decreaseFactorRef.value)?.focus();
 });
 
 onBeforeUnmount(() => {
@@ -271,76 +295,35 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .settings-page {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
   padding: 2rem;
-}
-
-.settings-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: var(--text-primary);
 }
 
 .settings-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .setting-group {
-  padding: 1.5rem;
-  background-color: var(--button-bg);
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border: 1px solid var(--border-color);
+  padding: 1rem;
 }
 
 .setting-label {
-  font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
 }
 
 .setting-hint {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  margin: 0;
-  opacity: 0.7;
+  margin: 0.5rem 0 0;
 }
 
 .slider-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-}
-
-.slider-button {
-  padding: 1rem 1.5rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  min-width: 80px;
-}
-
-.slider-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .slider-value {
@@ -349,61 +332,5 @@ onBeforeUnmount(() => {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--accent);
-}
-
-.toggle-button {
-  padding: 1rem 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  align-self: flex-start;
-}
-
-.toggle-button.active {
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-}
-
-.toggle-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
-}
-
-.action-button {
-  padding: 1.25rem 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  align-self: flex-start;
-}
-
-.action-button.pro {
-  background-color: rgba(255, 193, 7, 0.2);
-  border-color: #ffc107;
-}
-
-.action-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
 }
 </style>
