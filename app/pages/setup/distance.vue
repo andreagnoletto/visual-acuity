@@ -1,10 +1,10 @@
 <template>
-  <div class="setup-page">
+  <v-container class="setup-page" fluid>
     <DistanceSelector
       v-model="distance"
       @confirm="handleConfirm"
     />
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -35,4 +35,3 @@ useRemoteNavigation({
   padding: 1rem;
 }
 </style>
-

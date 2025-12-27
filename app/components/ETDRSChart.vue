@@ -1,28 +1,32 @@
 <template>
-  <div class="etdrs-chart">
-    <div
+  <v-container class="etdrs-chart" fluid>
+    <v-row
       v-for="(line, index) in visibleLines"
       :key="line.lineIndex"
       class="etdrs-line"
+      align="center"
+      no-gutters
       :class="{ 'current-line': line.lineIndex === currentLineIndex }"
       :style="{ fontSize: line.fontSizePx + 'px' }"
     >
-      <div class="line-label">
+      <v-col cols="auto" class="line-label">
         <span class="line-number">Linha {{ line.lineNumber }}</span>
         <span class="snellen-ratio">{{ line.snellenRatio }}</span>
         <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
-      </div>
-      <div class="optotypes-container">
-        <span
-          v-for="(optotype, optIndex) in line.displayOptotypes"
-          :key="optIndex"
-          class="optotype"
-        >
-          {{ optotype }}
-        </span>
-      </div>
-    </div>
-  </div>
+      </v-col>
+      <v-col>
+        <v-sheet class="optotypes-container" color="transparent">
+          <span
+            v-for="(optotype, optIndex) in line.displayOptotypes"
+            :key="optIndex"
+            class="optotype"
+          >
+            {{ optotype }}
+          </span>
+        </v-sheet>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -181,4 +185,3 @@ const visibleLines = computed<ETDRSLineDisplay[]>(() => {
   color: inherit;
 }
 </style>
-

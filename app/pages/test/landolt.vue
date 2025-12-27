@@ -1,108 +1,159 @@
 <template>
-  <div class="test-page">
+  <v-container class="test-page" fluid>
     <CalibrationGate v-if="!isCalibrationReady" />
-    <div v-else class="test-content">
-      <div class="test-header">
-        <button
-          ref="backButtonRef"
-          class="back-button"
-          @click="goBack"
-          @keydown="handleBackKeyDown"
-        >
-          ← Voltar
-        </button>
-        <button
-          ref="assistedToggleRef"
-          class="assisted-toggle"
-          :class="{ active: assistedMode }"
-          @click="toggleAssistedMode"
-          @keydown="handleToggleKeyDown"
-        >
-          {{ assistedMode ? 'Modo Assistido ON' : 'Modo Assistido OFF' }}
-        </button>
-      </div>
+    <v-card v-else class="test-content" variant="outlined">
+      <v-card-text>
+        <v-row class="test-header" align="center" justify="space-between">
+          <v-btn
+            ref="backButtonRef"
+            class="back-button"
+            variant="tonal"
+            color="secondary"
+            @click="goBack"
+            @keydown="handleBackKeyDown"
+          >
+            ← Voltar
+          </v-btn>
+          <v-btn
+            ref="assistedToggleRef"
+            class="assisted-toggle"
+            :color="assistedMode ? 'primary' : 'secondary'"
+            :variant="assistedMode ? 'elevated' : 'tonal'"
+            @click="toggleAssistedMode"
+            @keydown="handleToggleKeyDown"
+          >
+            {{ assistedMode ? 'Modo Assistido ON' : 'Modo Assistido OFF' }}
+          </v-btn>
+        </v-row>
 
-      <div v-if="assistedMode" class="assisted-hint">
-        <p class="hint-text">
-          <strong>Modo Assistido:</strong> Use o controle remoto para navegar. 
-          O acompanhante deve observar as respostas do paciente.
-        </p>
-      </div>
+        <v-alert v-if="assistedMode" class="assisted-hint" type="info" variant="tonal">
+          <p class="hint-text">
+            <strong>Modo Assistido:</strong> Use o controle remoto para navegar.
+            O acompanhante deve observar as respostas do paciente.
+          </p>
+        </v-alert>
 
-      <div class="optotype-chart">
-        <div
-          v-for="(line, index) in visibleLines"
-          :key="line.lineIndex"
-          class="optotype-line"
-          :class="{ 'current-line': line.lineIndex === currentLineIndex }"
-          :style="{ fontSize: line.fontSizePx + 'px' }"
-        >
-          <div class="line-label">
-            <span class="snellen-ratio">{{ line.snellenRatio }}</span>
-            <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
-          </div>
-          <div class="directions-container">
-            <div
-              v-for="(optotype, optIndex) in line.directions"
-              :key="optIndex"
-              class="direction"
-            >
-              <svg class="optotype-c" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" :style="{ transform: `rotate(${optotype.rotation}deg)` }">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="15" :stroke-dasharray="getLandoltGap(optotype.rotation)" :stroke-dashoffset="getLandoltOffset(optotype.rotation)" />
-              </svg>
-            </div>
-          </div>
+        <div class="optotype-chart">
+          <v-row
+            v-for="(line, index) in visibleLines"
+            :key="line.lineIndex"
+            class="optotype-line"
+            align="center"
+            no-gutters
+            :class="{ 'current-line': line.lineIndex === currentLineIndex }"
+            :style="{ fontSize: line.fontSizePx + 'px' }"
+          >
+            <v-col cols="auto" class="line-label">
+              <span class="snellen-ratio">{{ line.snellenRatio }}</span>
+              <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
+            </v-col>
+            <v-col>
+              <v-sheet class="directions-container" color="transparent">
+                <div
+                  v-for="(optotype, optIndex) in line.directions"
+                  :key="optIndex"
+                  class="direction"
+                >
+                  <svg
+                    class="optotype-c"
+                    viewBox="0 0 100 100"
+                    xmlns="http://www.w3.org/2000/svg"
+                    :style="{ transform: `rotate(${optotype.rotation}deg)` }"
+                  >
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="15"
+                      :stroke-dasharray="getLandoltGap(optotype.rotation)"
+                      :stroke-dashoffset="getLandoltOffset(optotype.rotation)"
+                    />
+                  </svg>
+                </div>
+              </v-sheet>
+            </v-col>
+          </v-row>
         </div>
-      </div>
 
-      <div v-if="assistedMode" class="assisted-controls">
-        <button
-          ref="upButtonRef"
-          class="assisted-button"
-          @click="moveLineUp"
-        >
-          ↑ Linha Anterior
-        </button>
-        <button
-          ref="randomizeButtonRef"
-          class="assisted-button"
-          @click="randomizeDirections"
-        >
-          ↻ Randomizar
-        </button>
-        <button
-          ref="confirmButtonRef"
-          class="assisted-button confirm"
-          @click="confirmSeen"
-        >
-          ✓ Vi essas direções
-        </button>
-        <button
-          ref="downButtonRef"
-          class="assisted-button"
-          @click="moveLineDown"
-        >
-          ↓ Próxima Linha
-        </button>
-      </div>
+        <v-row v-if="assistedMode" class="assisted-controls" dense>
+          <v-col cols="12" md="6">
+            <v-btn
+              ref="upButtonRef"
+              class="assisted-button"
+              block
+              size="x-large"
+              variant="tonal"
+              color="secondary"
+              @click="moveLineUp"
+            >
+              ↑ Linha Anterior
+            </v-btn>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-btn
+              ref="randomizeButtonRef"
+              class="assisted-button"
+              block
+              size="x-large"
+              variant="tonal"
+              color="secondary"
+              @click="randomizeDirections"
+            >
+              ↻ Randomizar
+            </v-btn>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-btn
+              ref="confirmButtonRef"
+              class="assisted-button confirm"
+              block
+              size="x-large"
+              variant="elevated"
+              color="primary"
+              @click="confirmSeen"
+            >
+              ✓ Vi essas direções
+            </v-btn>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-btn
+              ref="downButtonRef"
+              class="assisted-button"
+              block
+              size="x-large"
+              variant="tonal"
+              color="secondary"
+              @click="moveLineDown"
+            >
+              ↓ Próxima Linha
+            </v-btn>
+          </v-col>
+        </v-row>
 
-      <div v-else class="instructions">
-        <p>Use ↑↓ para mudar de linha, ←→ para randomizar, Enter para confirmar "vista"</p>
-      </div>
+        <v-alert v-else class="instructions" type="info" variant="tonal">
+          <p>Use ↑↓ para mudar de linha, ←→ para randomizar, Enter para confirmar "vista"</p>
+        </v-alert>
 
-      <div v-if="testComplete" class="test-result">
-        <h3>Teste Concluído</h3>
-        <p>Última linha vista: {{ lastSeenLine?.snellenRatio || 'N/A' }}</p>
-        <button
-          ref="finishButtonRef"
-          class="finish-button"
-          @click="finishTest"
-        >
-          Finalizar
-        </button>
-      </div>
-    </div>
-  </div>
+        <v-card v-if="testComplete" class="test-result" variant="tonal">
+          <v-card-title>Teste Concluído</v-card-title>
+          <v-card-text>
+            <p>Última linha vista: {{ lastSeenLine?.snellenRatio || 'N/A' }}</p>
+            <v-btn
+              ref="finishButtonRef"
+              class="finish-button"
+              color="primary"
+              size="large"
+              @click="finishTest"
+            >
+              Finalizar
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-card-text>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -110,13 +161,12 @@ definePageMeta({
   layout: 'test'
 });
 
-import { VISION_LINES, parseSnellenRatio } from '~/domain/vision/lines';
+import { VISION_LINES } from '~/domain/vision/lines';
 import { useOptotypeGenerator } from '~/composables/useOptotypeGenerator';
 
-// C de Landolt: 8 direções (gap em 8 posições)
 interface LandoltOptotype {
   type: 'C';
-  rotation: number; // 0, 45, 90, 135, 180, 225, 270, 315
+  rotation: number;
   label: string;
 }
 
@@ -132,13 +182,12 @@ const LANDOLT_OPTOTYPES: LandoltOptotype[] = [
 ];
 
 const { isCalibrationReady } = useCalibration();
-const { getLine, calculateOptotypesPerLine, generateLines, calculateVisibleLinesCount } = useOptotypeGenerator();
+const { calculateOptotypesPerLine, generateLines, calculateVisibleLinesCount } = useOptotypeGenerator();
 
 const currentLineIndex = ref(0);
 const assistedMode = ref(false);
 const testComplete = ref(false);
 const lastSeenLine = ref<{ snellenRatio: string; logMAR: number } | null>(null);
-const currentDirections = ref<LandoltOptotype[]>([]);
 
 interface VisibleLine {
   lineIndex: number;
@@ -151,18 +200,18 @@ interface VisibleLine {
 const visibleLines = computed<VisibleLine[]>(() => {
   const _ = windowWidth.value;
   const _h = windowHeight.value;
-  
+
   const lines = generateLines();
   if (lines.length === 0) return [];
-  
+
   const currentLine = lines[currentLineIndex.value];
   if (!currentLine) return [];
-  
+
   const visibleCount = calculateVisibleLinesCount(currentLine.fontSizePx, windowHeight.value);
   const halfCount = Math.floor(visibleCount / 2);
   const startIndex = Math.max(0, currentLineIndex.value - halfCount);
   const endIndex = Math.min(lines.length - 1, currentLineIndex.value + (visibleCount - halfCount - 1));
-  
+
   const result: VisibleLine[] = [];
   for (let i = startIndex; i <= endIndex; i++) {
     const line = lines[i];
@@ -171,12 +220,12 @@ const visibleLines = computed<VisibleLine[]>(() => {
       const count = calculateDirectionsCount(line.fontSizePx, line.snellenRatio);
       const pool = [...LANDOLT_OPTOTYPES];
       const directions: LandoltOptotype[] = [];
-      
+
       for (let j = 0; j < count; j++) {
         const randomIndex = Math.floor(Math.random() * pool.length);
         directions.push(pool[randomIndex]);
       }
-      
+
       result.push({
         lineIndex: i,
         snellenRatio: line.snellenRatio,
@@ -186,7 +235,7 @@ const visibleLines = computed<VisibleLine[]>(() => {
       });
     }
   }
-  
+
   return result;
 });
 
@@ -211,17 +260,23 @@ const calculateDirectionsCount = (fontSizePx: number, snellenRatio: string): num
   return calculateOptotypesPerLine(fontSizePx, snellenRatio, windowWidth.value);
 };
 
-const backButtonRef = ref<HTMLButtonElement>();
-const assistedToggleRef = ref<HTMLButtonElement>();
-const upButtonRef = ref<HTMLButtonElement>();
-const randomizeButtonRef = ref<HTMLButtonElement>();
-const confirmButtonRef = ref<HTMLButtonElement>();
-const downButtonRef = ref<HTMLButtonElement>();
-const finishButtonRef = ref<HTMLButtonElement>();
+const backButtonRef = ref<unknown>(null);
+const assistedToggleRef = ref<unknown>(null);
+const upButtonRef = ref<unknown>(null);
+const randomizeButtonRef = ref<unknown>(null);
+const confirmButtonRef = ref<unknown>(null);
+const downButtonRef = ref<unknown>(null);
+const finishButtonRef = ref<unknown>(null);
 
 const { normalizeRemoteKey } = useRemoteNavigation({
   restoreFocus: true
 });
+
+const resolveElement = (target: unknown): HTMLElement | null => {
+  if (!target) return null;
+  if (target instanceof HTMLElement) return target;
+  return (target as { $el?: HTMLElement }).$el ?? null;
+};
 
 const goBack = () => {
   navigateTo('/');
@@ -234,7 +289,6 @@ const handleBackKeyDown = (event: KeyboardEvent) => {
     goBack();
   }
 };
-
 
 const getLandoltGap = (rotation: number): string => {
   const gapSize = 50;
@@ -249,7 +303,6 @@ const getLandoltOffset = (rotation: number): number => {
 };
 
 const randomizeDirections = () => {
-  // Forçar recálculo do computed visibleLines
   const _ = windowWidth.value;
   const _h = windowHeight.value;
 };
@@ -280,7 +333,7 @@ const confirmSeen = () => {
     } else {
       testComplete.value = true;
       nextTick(() => {
-        finishButtonRef.value?.focus();
+        resolveElement(finishButtonRef.value)?.focus();
       });
     }
   }
@@ -333,9 +386,7 @@ watch([windowWidth, windowHeight, currentLineIndex], () => {
 
 onMounted(() => {
   randomizeDirections();
-  if (backButtonRef.value) {
-    backButtonRef.value.focus();
-  }
+  resolveElement(backButtonRef.value)?.focus();
 });
 </script>
 
@@ -358,63 +409,10 @@ onMounted(() => {
 }
 
 .test-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.5rem 0;
 }
 
-.back-button {
-  padding: 0.5rem 1.5rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.back-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  border-color: var(--accent);
-  background-color: var(--button-active-bg);
-}
-
-.assisted-toggle {
-  padding: 0.75rem 1.5rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.assisted-toggle.active {
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-}
-
-.assisted-toggle:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  border-color: var(--accent);
-}
-
 .assisted-hint {
-  padding: 1.5rem;
-  background-color: var(--button-active-bg);
-  border: 2px solid var(--accent);
-  border-radius: 0.75rem;
   text-align: center;
 }
 
@@ -436,10 +434,6 @@ onMounted(() => {
 }
 
 .optotype-line {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 2rem;
   width: 100%;
   justify-content: center;
   opacity: 0.3;
@@ -513,84 +507,27 @@ onMounted(() => {
 }
 
 .assisted-controls {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 2rem 0;
 }
 
 .assisted-button {
-  padding: 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
   min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.assisted-button.confirm {
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-}
-
-.assisted-button:focus-visible {
-  outline: 4px solid #00ff00;
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .instructions {
   text-align: center;
-  padding: 1rem;
-  color: var(--text-secondary);
-  opacity: 0.7;
   font-size: 0.875rem;
+  opacity: 0.7;
 }
 
 .test-result {
-  padding: 2rem;
-  background-color: rgba(0, 255, 0, 0.1);
-  border: 2px solid rgba(0, 255, 0, 0.3);
-  border-radius: 0.75rem;
   text-align: center;
-}
-
-.test-result h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
 }
 
 .finish-button {
   margin-top: 1.5rem;
-  padding: 1rem 3rem;
-  background-color: rgba(0, 255, 0, 0.2);
-  border: 3px solid #00ff00;
-  border-radius: 0.75rem;
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.finish-button:focus-visible {
-  outline: 4px solid #00ff00;
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: rgba(0, 255, 0, 0.3);
-  box-shadow: 0 0 20px var(--accent);
 }
 </style>
-

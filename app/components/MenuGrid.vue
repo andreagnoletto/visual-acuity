@@ -1,16 +1,26 @@
 <template>
-  <div class="menu-grid" ref="gridRef">
-    <button
-      v-for="(item, index) in items"
-      :key="index"
-      :ref="(el) => setItemRef(el, index)"
-      class="menu-item"
-      @click="handleItemClick(item)"
-      @keydown="handleKeyDown($event, index)"
-    >
-      {{ item.label }}
-    </button>
-  </div>
+  <v-container class="menu-grid" ref="gridRef" fluid>
+    <v-row dense>
+      <v-col
+        v-for="(item, index) in items"
+        :key="index"
+        :cols="columnSpan"
+      >
+        <v-btn
+          :ref="(el) => setItemRef(el, index)"
+          class="menu-item"
+          block
+          size="x-large"
+          variant="tonal"
+          color="primary"
+          @click="handleItemClick(item)"
+          @keydown="handleKeyDown($event, index)"
+        >
+          {{ item.label }}
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -28,15 +38,24 @@ const props = withDefaults(defineProps<Props>(), {
   columns: 2
 });
 
-const gridRef = ref<HTMLElement>();
+const gridRef = ref<unknown>(null);
 const itemRefs = ref<HTMLElement[]>([]);
 const currentIndex = ref(0);
 
-const setItemRef = (el: HTMLElement | null, index: number) => {
-  if (el) {
-    itemRefs.value[index] = el;
+const resolveElement = (target: unknown): HTMLElement | null => {
+  if (!target) return null;
+  if (target instanceof HTMLElement) return target;
+  return (target as { $el?: HTMLElement }).$el ?? null;
+};
+
+const setItemRef = (el: unknown, index: number) => {
+  const element = resolveElement(el);
+  if (element) {
+    itemRefs.value[index] = element;
   }
 };
+
+const columnSpan = computed(() => Math.max(1, Math.floor(12 / props.columns)));
 
 const { normalizeRemoteKey, saveFocus, restoreFocus } = useRemoteNavigation({
   restoreFocus: true
@@ -126,42 +145,18 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .menu-grid {
-  display: grid;
-  grid-template-columns: repeat(v-bind('props.columns'), 1fr);
-  gap: 1.5rem;
   width: 100%;
   max-width: 800px;
   padding: 2rem;
 }
 
 .menu-item {
-  padding: 2rem;
-  background-color: var(--button-bg);
-  border: 3px solid transparent;
-  border-radius: 0.75rem;
-  color: var(--text-primary);
+  min-height: 120px;
   font-size: 1.25rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-item:hover {
-  background-color: var(--button-bg-hover);
 }
 
 .menu-item:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
+  transform: scale(1.02);
 }
 </style>
-

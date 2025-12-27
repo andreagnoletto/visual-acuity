@@ -1,47 +1,54 @@
 <template>
-  <div class="distance-selector">
-    <h2 class="selector-title">Selecione a distância</h2>
-    <div class="distance-options">
-      <button
-        v-for="(option, index) in distanceOptions"
-        :key="index"
-        :ref="(el) => setItemRef(el, index)"
-        class="distance-option"
-        :class="{ active: selectedDistance === option.value }"
-        @click="selectDistance(option.value)"
-        @keydown="handleKeyDown($event, index)"
-      >
-        {{ option.label }}
-      </button>
-    </div>
-    <div v-if="customDistance" class="custom-distance">
-      <label class="custom-label">Distância customizada (metros):</label>
-      <input
-        ref="customInputRef"
-        type="number"
-        v-model.number="customValue"
-        min="1"
-        max="15"
-        step="0.1"
-        class="custom-input"
-        @keydown="handleInputKeyDown"
-        @blur="confirmCustomDistance"
-      />
-    </div>
-    <div v-if="warning" class="warning-box">
-      {{ warning }}
-    </div>
-    <div class="actions">
-      <button
+  <v-card class="distance-selector" variant="outlined">
+    <v-card-title class="selector-title">Selecione a distância</v-card-title>
+    <v-card-text>
+      <v-row class="distance-options" dense>
+        <v-col cols="12" v-for="(option, index) in distanceOptions" :key="index">
+          <v-btn
+            :ref="(el) => setItemRef(el, index)"
+            class="distance-option"
+            :color="selectedDistance === option.value ? 'primary' : 'secondary'"
+            :variant="selectedDistance === option.value ? 'elevated' : 'tonal'"
+            block
+            size="large"
+            @click="selectDistance(option.value)"
+            @keydown="handleKeyDown($event, index)"
+          >
+            {{ option.label }}
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-sheet v-if="customDistance" class="custom-distance" variant="tonal">
+        <label class="custom-label">Distância customizada (metros):</label>
+        <v-text-field
+          ref="customInputRef"
+          v-model.number="customValue"
+          type="number"
+          min="1"
+          max="15"
+          step="0.1"
+          density="comfortable"
+          hide-details
+          @keydown="handleInputKeyDown"
+          @blur="confirmCustomDistance"
+        />
+      </v-sheet>
+      <v-alert v-if="warning" type="warning" variant="tonal" class="warning-box">
+        {{ warning }}
+      </v-alert>
+    </v-card-text>
+    <v-card-actions class="actions">
+      <v-btn
         ref="confirmRef"
-        class="confirm-button"
+        color="primary"
+        size="large"
         @click="confirm"
         @keydown="handleConfirmKeyDown"
       >
         Confirmar
-      </button>
-    </div>
-  </div>
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -72,8 +79,8 @@ const customDistance = ref(false);
 const customValue = ref(3.0);
 const warning = ref<string | null>(null);
 const itemRefs = ref<HTMLElement[]>([]);
-const customInputRef = ref<HTMLInputElement>();
-const confirmRef = ref<HTMLButtonElement>();
+const customInputRef = ref<unknown>(null);
+const confirmRef = ref<unknown>(null);
 
 const { normalizeRemoteKey, saveFocus, restoreFocus } = useRemoteNavigation({
   restoreFocus: true
@@ -81,9 +88,22 @@ const { normalizeRemoteKey, saveFocus, restoreFocus } = useRemoteNavigation({
 
 const currentIndex = ref(0);
 
-const setItemRef = (el: HTMLElement | null, index: number) => {
-  if (el) {
-    itemRefs.value[index] = el;
+const resolveElement = (target: unknown): HTMLElement | null => {
+  if (!target) return null;
+  if (target instanceof HTMLElement) return target;
+  return (target as { $el?: HTMLElement }).$el ?? null;
+};
+
+const focusTextFieldInput = () => {
+  const element = resolveElement(customInputRef.value);
+  const input = element?.querySelector('input') as HTMLInputElement | null;
+  input?.focus();
+};
+
+const setItemRef = (el: unknown, index: number) => {
+  const element = resolveElement(el);
+  if (element) {
+    itemRefs.value[index] = element;
   }
 };
 
@@ -94,7 +114,10 @@ const updateTabindex = () => {
     }
   });
   if (confirmRef.value) {
-    confirmRef.value.tabIndex = currentIndex.value === distanceOptions.length ? 0 : -1;
+    const element = resolveElement(confirmRef.value);
+    if (element) {
+      element.tabIndex = currentIndex.value === distanceOptions.length ? 0 : -1;
+    }
   }
 };
 
@@ -103,7 +126,7 @@ const selectDistance = (value: number) => {
     customDistance.value = true;
     selectedDistance.value = null;
     nextTick(() => {
-      customInputRef.value?.focus();
+      focusTextFieldInput();
     });
   } else {
     customDistance.value = false;
@@ -147,7 +170,7 @@ const moveFocus = (direction: 'UP' | 'DOWN') => {
   if (newIndex < distanceOptions.length) {
     itemRefs.value[newIndex]?.focus();
   } else {
-    confirmRef.value?.focus();
+    resolveElement(confirmRef.value)?.focus();
   }
   saveFocus(newIndex);
 };
@@ -177,7 +200,7 @@ const handleInputKeyDown = (event: KeyboardEvent) => {
   } else if (action === 'OK' || action === 'DOWN') {
     event.preventDefault();
     confirmCustomDistance();
-    confirmRef.value?.focus();
+    resolveElement(confirmRef.value)?.focus();
     currentIndex.value = distanceOptions.length;
     updateTabindex();
   }
@@ -198,12 +221,16 @@ const handleConfirmKeyDown = (event: KeyboardEvent) => {
 
 onMounted(() => {
   updateTabindex();
-  if (!restoreFocus([...itemRefs.value, confirmRef.value].filter(Boolean) as HTMLElement[])) {
+  const focusableItems = [
+    ...itemRefs.value,
+    resolveElement(confirmRef.value)
+  ].filter(Boolean) as HTMLElement[];
+  if (!restoreFocus(focusableItems)) {
     if (itemRefs.value[0]) {
       itemRefs.value[0].focus();
     }
   } else {
-    const savedIndex = [...itemRefs.value, confirmRef.value].findIndex(item => item && item.tabIndex === 0);
+    const savedIndex = focusableItems.findIndex(item => item && item.tabIndex === 0);
     if (savedIndex >= 0) {
       currentIndex.value = savedIndex;
     }
@@ -211,7 +238,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  const activeIndex = [...itemRefs.value, confirmRef.value].findIndex(item => item && item.tabIndex === 0);
+  const activeIndex = [...itemRefs.value, resolveElement(confirmRef.value)]
+    .findIndex(item => item && item.tabIndex === 0);
   if (activeIndex >= 0) {
     saveFocus(activeIndex);
   }
@@ -222,7 +250,6 @@ onBeforeUnmount(() => {
 .distance-selector {
   width: 100%;
   max-width: 400px;
-  padding: 1rem;
 }
 
 .selector-title {
@@ -233,109 +260,33 @@ onBeforeUnmount(() => {
 }
 
 .distance-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .distance-option {
-  padding: 1rem;
-  background-color: var(--button-bg);
-  border: 2px solid transparent;
-  border-radius: 0.5rem;
-  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-  text-align: center;
-}
-
-.distance-option.active {
-  background-color: var(--button-active-bg);
-  border-color: var(--accent);
-}
-
-.distance-option:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
 }
 
 .custom-distance {
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background-color: var(--button-bg);
   border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
 }
 
 .custom-label {
   display: block;
   margin-bottom: 0.5rem;
   font-size: 0.75rem;
-  color: var(--text-secondary);
   opacity: 0.8;
 }
 
-.custom-input {
-  width: 100%;
-  padding: 0.5rem;
-  background-color: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: 0.5rem;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  outline: none;
-}
-
-.custom-input:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-  transform: scale(1.02);
-}
-
 .warning-box {
-  padding: 0.75rem;
-  background-color: rgba(255, 193, 7, 0.15);
-  border: 2px solid #ffc107;
-  border-radius: 0.5rem;
-  color: #ffc107;
-  font-size: 0.75rem;
   margin-bottom: 1rem;
-  text-align: center;
 }
 
 .actions {
   display: flex;
   justify-content: center;
 }
-
-.confirm-button {
-  padding: 0.75rem 2rem;
-  background-color: var(--button-active-bg);
-  border: 2px solid var(--accent);
-  border-radius: 0.5rem;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.confirm-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
-}
 </style>
-
