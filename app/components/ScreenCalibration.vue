@@ -1,64 +1,70 @@
 <template>
-  <div class="screen-calibration">
-    <h2 class="calibration-title">Calibração da Tela</h2>
-    <p class="calibration-instruction">
-      Coloque uma régua de 10cm x 10cm (ou um cartão de referência de 85,6mm) na tela e ajuste o retângulo com as setas ←→ para corresponder ao tamanho da régua ou cartão.
-    </p>
-    
-    <div class="calibration-area">
-      <div
-        ref="cardRef"
-        class="reference-card"
-        :style="{ width: cardWidthPx + 'px', height: cardHeightPx + 'px' }"
-      >
-        <div class="card-label">10cm × 10cm<br/>85,6mm</div>
-      </div>
-    </div>
+  <v-card class="screen-calibration" variant="outlined">
+    <v-card-title class="calibration-title">Calibração da Tela</v-card-title>
+    <v-card-text>
+      <p class="calibration-instruction">
+        Coloque uma régua de 10cm x 10cm (ou um cartão de referência de 85,6mm) na tela e ajuste o retângulo com as setas ←→ para corresponder ao tamanho da régua ou cartão.
+      </p>
+      <v-sheet class="calibration-area" rounded="lg">
+        <div
+          ref="cardRef"
+          class="reference-card"
+          :style="{ width: cardWidthPx + 'px', height: cardHeightPx + 'px' }"
+        >
+          <div class="card-label">10cm × 10cm<br/>85,6mm</div>
+        </div>
+      </v-sheet>
 
-    <div class="controls">
-      <div class="control-group">
-        <label class="control-label">Largura:</label>
-        <div class="control-buttons">
-          <button
-            ref="decreaseRef"
-            class="control-button"
-            @click="decreaseWidth"
-            @keydown="handleControlKeyDown($event, 'decrease')"
-          >
-            ← Diminuir
-          </button>
-          <span class="control-value">{{ cardWidthPx.toFixed(1) }}px</span>
-          <button
-            ref="increaseRef"
-            class="control-button"
-            @click="increaseWidth"
-            @keydown="handleControlKeyDown($event, 'increase')"
-          >
-            Aumentar →
-          </button>
+      <div class="controls">
+        <div class="control-group">
+          <label class="control-label">Largura:</label>
+          <div class="control-buttons">
+            <v-btn
+              ref="decreaseRef"
+              class="control-button"
+              variant="tonal"
+              color="secondary"
+              @click="decreaseWidth"
+              @keydown="handleControlKeyDown($event, 'decrease')"
+            >
+              ← Diminuir
+            </v-btn>
+            <span class="control-value">{{ cardWidthPx.toFixed(1) }}px</span>
+            <v-btn
+              ref="increaseRef"
+              class="control-button"
+              variant="tonal"
+              color="secondary"
+              @click="increaseWidth"
+              @keydown="handleControlKeyDown($event, 'increase')"
+            >
+              Aumentar →
+            </v-btn>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="warning" class="warning-box">
-      {{ warning }}
-    </div>
+      <v-alert v-if="warning" type="warning" variant="tonal" class="warning-box">
+        {{ warning }}
+      </v-alert>
 
-    <div class="info-box">
-      <p>px/cm calculado: <strong>{{ calculatedPxPerCm.toFixed(2) }}</strong></p>
-    </div>
+      <v-alert class="info-box" type="info" variant="tonal">
+        <p>px/cm calculado: <strong>{{ calculatedPxPerCm.toFixed(2) }}</strong></p>
+      </v-alert>
+    </v-card-text>
 
-    <div class="actions">
-      <button
+    <v-card-actions class="actions">
+      <v-btn
         ref="confirmRef"
-        class="confirm-button"
+        color="primary"
+        size="large"
         @click="confirm"
         @keydown="handleConfirmKeyDown"
       >
         Confirmar Calibração
-      </button>
-    </div>
-  </div>
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -73,10 +79,10 @@ const cardWidthPx = ref(200);
 const cardHeightPx = ref(200);
 const warning = ref<string | null>(null);
 
-const cardRef = ref<HTMLElement>();
-const decreaseRef = ref<HTMLButtonElement>();
-const increaseRef = ref<HTMLButtonElement>();
-const confirmRef = ref<HTMLButtonElement>();
+const cardRef = ref<unknown>(null);
+const decreaseRef = ref<unknown>(null);
+const increaseRef = ref<unknown>(null);
+const confirmRef = ref<unknown>(null);
 
 const { normalizeRemoteKey, saveFocus, restoreFocus, savedFocusIndex } = useRemoteNavigation({
   restoreFocus: true
@@ -88,8 +94,18 @@ const calculatedPxPerCm = computed(() => {
   return cardWidthPx.value / (CARD_WIDTH_MM / 10);
 });
 
+const resolveElement = (target: unknown): HTMLElement | null => {
+  if (!target) return null;
+  if (target instanceof HTMLElement) return target;
+  return (target as { $el?: HTMLElement }).$el ?? null;
+};
+
 const updateTabindex = () => {
-  const items = [decreaseRef.value, increaseRef.value, confirmRef.value].filter(Boolean) as HTMLElement[];
+  const items = [
+    resolveElement(decreaseRef.value),
+    resolveElement(increaseRef.value),
+    resolveElement(confirmRef.value)
+  ].filter(Boolean) as HTMLElement[];
   items.forEach((item, index) => {
     if (item) {
       item.tabIndex = index === currentIndex.value ? 0 : -1;
@@ -141,7 +157,11 @@ const handleControlKeyDown = (event: KeyboardEvent, action: 'decrease' | 'increa
     }
   } else if (actionKey === 'UP' || actionKey === 'DOWN') {
     event.preventDefault();
-    const items = [decreaseRef.value, increaseRef.value, confirmRef.value].filter(Boolean) as HTMLElement[];
+    const items = [
+      resolveElement(decreaseRef.value),
+      resolveElement(increaseRef.value),
+      resolveElement(confirmRef.value)
+    ].filter(Boolean) as HTMLElement[];
     const currentItemIndex = action === 'decrease' ? 0 : 1;
     let newIndex = currentItemIndex;
     
@@ -171,7 +191,7 @@ const handleConfirmKeyDown = (event: KeyboardEvent) => {
     event.preventDefault();
     currentIndex.value = 1;
     updateTabindex();
-    increaseRef.value?.focus();
+    resolveElement(increaseRef.value)?.focus();
   } else if (action === 'OK') {
     event.preventDefault();
     confirm();
@@ -181,20 +201,26 @@ const handleConfirmKeyDown = (event: KeyboardEvent) => {
 onMounted(() => {
   restoreFocus();
   updateTabindex();
-  const items = [decreaseRef.value, increaseRef.value, confirmRef.value].filter(Boolean) as HTMLElement[];
+  const items = [
+    resolveElement(decreaseRef.value),
+    resolveElement(increaseRef.value),
+    resolveElement(confirmRef.value)
+  ].filter(Boolean) as HTMLElement[];
   if (savedFocusIndex.value !== null && savedFocusIndex.value >= 0 && savedFocusIndex.value < items.length) {
     currentIndex.value = savedFocusIndex.value;
     updateTabindex();
     items[savedFocusIndex.value]?.focus();
   } else {
-    if (decreaseRef.value) {
-      decreaseRef.value.focus();
-    }
+    resolveElement(decreaseRef.value)?.focus();
   }
 });
 
 onBeforeUnmount(() => {
-  const items = [decreaseRef.value, increaseRef.value, confirmRef.value].filter(Boolean) as HTMLElement[];
+  const items = [
+    resolveElement(decreaseRef.value),
+    resolveElement(increaseRef.value),
+    resolveElement(confirmRef.value)
+  ].filter(Boolean) as HTMLElement[];
   const activeIndex = items.findIndex(item => item.tabIndex === 0);
   if (activeIndex >= 0) {
     saveFocus(activeIndex);
@@ -206,7 +232,6 @@ onBeforeUnmount(() => {
 .screen-calibration {
   width: 100%;
   max-width: 500px;
-  padding: 1rem;
 }
 
 .calibration-title {
@@ -231,24 +256,20 @@ onBeforeUnmount(() => {
   align-items: center;
   min-height: 200px;
   margin-bottom: 1rem;
-  background-color: var(--button-bg);
-  border-radius: 0.75rem;
   padding: 1rem;
-  border: 1px solid var(--border-color);
 }
 
 .reference-card {
-  background-color: var(--bg-primary);
-  border: 3px solid var(--accent);
+  background-color: rgb(var(--v-theme-background));
+  border: 3px solid rgb(var(--v-theme-primary));
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px var(--accent);
+  box-shadow: 0 0 20px rgba(var(--v-theme-primary), 0.5);
 }
 
 .card-label {
-  color: var(--text-primary);
   font-size: 1rem;
   font-weight: bold;
 }
@@ -266,7 +287,6 @@ onBeforeUnmount(() => {
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
   text-align: center;
-  color: var(--text-primary);
 }
 
 .control-buttons {
@@ -277,25 +297,8 @@ onBeforeUnmount(() => {
 }
 
 .control-button {
-  padding: 0.75rem 1rem;
-  background-color: var(--button-bg);
-  border: 2px solid transparent;
-  border-radius: 0.5rem;
-  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.control-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
 }
 
 .control-value {
@@ -303,37 +306,25 @@ onBeforeUnmount(() => {
   text-align: center;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--accent);
+  color: rgb(var(--v-theme-primary));
 }
 
 .warning-box {
-  padding: 0.75rem;
-  background-color: rgba(255, 193, 7, 0.15);
-  border: 2px solid #ffc107;
-  border-radius: 0.5rem;
-  color: #ffc107;
   font-size: 0.75rem;
   margin-bottom: 1rem;
-  text-align: center;
 }
 
 .info-box {
-  padding: 0.75rem;
-  background-color: var(--button-active-bg);
-  border: 2px solid var(--accent);
-  border-radius: 0.5rem;
   margin-bottom: 1rem;
-  text-align: center;
 }
 
 .info-box p {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--text-primary);
 }
 
 .info-box strong {
-  color: var(--accent);
+  color: rgb(var(--v-theme-primary));
   font-size: 1rem;
 }
 
@@ -341,26 +332,4 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: center;
 }
-
-.confirm-button {
-  padding: 0.75rem 2rem;
-  background-color: var(--button-active-bg);
-  border: 2px solid var(--accent);
-  border-radius: 0.5rem;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.confirm-button:focus-visible {
-  outline: 4px solid var(--accent);
-  outline-offset: 2px;
-  transform: scale(1.05);
-  background-color: var(--button-active-bg);
-  box-shadow: 0 0 20px var(--accent);
-}
 </style>
-

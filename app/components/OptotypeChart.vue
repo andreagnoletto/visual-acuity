@@ -1,27 +1,31 @@
 <template>
-  <div class="optotype-chart">
-    <div
+  <v-container class="optotype-chart" fluid>
+    <v-row
       v-for="(line, index) in optotypeLines"
       :key="index"
       class="optotype-line"
+      align="center"
+      no-gutters
       :class="{ 'current-line': line.lineIndex === props.currentLineIndex }"
       :style="{ fontSize: line.fontSizePx + 'px' }"
     >
-      <div class="line-label">
+      <v-col cols="auto" class="line-label">
         <span class="snellen-ratio">{{ line.snellenRatio }}</span>
         <span class="logmar">logMAR {{ line.logMAR.toFixed(1) }}</span>
-      </div>
-      <div class="optotypes-container">
-        <span
-          v-for="(optotype, optIndex) in line.displayOptotypes"
-          :key="optIndex"
-          class="optotype"
-        >
-          {{ optotype }}
-        </span>
-      </div>
-    </div>
-  </div>
+      </v-col>
+      <v-col>
+        <v-sheet class="optotypes-container" color="transparent">
+          <span
+            v-for="(optotype, optIndex) in line.displayOptotypes"
+            :key="optIndex"
+            class="optotype"
+          >
+            {{ optotype }}
+          </span>
+        </v-sheet>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -177,4 +181,3 @@ const optotypeLines = computed<OptotypeLineDisplay[]>(() => {
   color: inherit;
 }
 </style>
-
