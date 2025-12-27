@@ -41,7 +41,7 @@ Aplicativo de triagem básica e treino de acuidade visual otimizado para TV, des
 
    ```bash
    git clone https://github.com/andreagnoletto/visual-acuity.git
-   cd visual-acuity/visual-acuity-app
+   cd visual-acuity
    ```
 
 2. Instale as dependências:
